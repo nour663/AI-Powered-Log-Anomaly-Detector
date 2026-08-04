@@ -22,30 +22,64 @@ MITRE_MAP = {
 }
 
 class LogDetector:
-    def __init__(self, model_path='models/isolation_forest.pkl'):
-        self.model  = joblib.load(model_path)
-        self.scaler = joblib.load('models/scaler.pkl')
+    def __init__(
+        self,
+        model_path="models/isolation_forest.pkl",
+        log_type="ssh"
+    ):
+
+        self.log_type = log_type
+
+        self.model = joblib.load(model_path)
+
+        self.scaler = joblib.load("models/scaler.pkl")
+
         self.alerts = []
 
     def analyze(self, log_path):
-        df       = parse_ssh_log(log_path)
+        # Parse the raw log file
+        df = parse_ssh_log(log_path)
+
+        # Build one feature vector per IP
         features = engineer_ssh_features(df)
 
-        X        = features[FEATURE_COLS].fillna(0)
+        X = features[FEATURE_COLS].fillna(0)
         X_scaled = self.scaler.transform(X)
 
-        features['anomaly_score'] = self.model.decision_function(X_scaled)
-        features['is_anomaly']    = self.model.predict(X_scaled)
+        features["anomaly_score"] = self.model.decision_function(X_scaled)
+        features["is_anomaly"] = self.model.predict(X_scaled)
 
-        anomalies = features[features['is_anomaly'] == -1]
+        # Suspicious IPs
+        anomalous_ips = features[features["is_anomaly"] == -1]
 
-        for _, row in anomalies.iterrows():
+        # Clear previous alerts
+        self.alerts = []
+
+        # Build alerts
+        for _, row in anomalous_ips.iterrows():
             alert = self.build_alert(row)
             self.alerts.append(alert)
             self.print_alert(alert)
 
-        return anomalies
+        # Merge anomaly information back into ALL logs
+        all_logs = df.merge(
+            features[["ip", "anomaly_score", "is_anomaly"]],
+            on="ip",
+            how="left"
+        )
 
+        # Replace missing values (IPs not found in features)
+        all_logs["anomaly_score"] = all_logs["anomaly_score"].fillna(0)
+
+        # model.predict() returns -1 for anomaly and 1 for normal
+        all_logs["is_anomaly"] = (
+            all_logs["is_anomaly"]
+            .fillna(1)
+            .astype(int)
+            .eq(-1)
+        )
+
+        return all_logs
     def build_alert(self, row):
         # Classify the type of anomaly
         if row['failure_rate'] > 0.8 and row['total_attempts'] > 10:
