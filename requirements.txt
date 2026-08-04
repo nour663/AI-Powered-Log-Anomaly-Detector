@@ -7,3 +7,5 @@ watchdog
 python-dotenv
 colorama
 reportlab
+streamlit
+joblib
