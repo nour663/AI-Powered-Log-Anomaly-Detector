@@ -42,7 +42,8 @@ write, no thresholds to tune.
 ![Normal Chart](assets/normal.png)
 ![Anomaly Chart](assets/anomaly_chart.png)
 
-
+### pdf report
+![Report](assets/report.png)
 ---
 
 ## 🛠️ Tech Stack
