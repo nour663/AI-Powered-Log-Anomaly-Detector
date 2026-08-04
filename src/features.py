@@ -2,9 +2,7 @@ import pandas as pd
 import numpy as np
 
 def engineer_ssh_features(df):
-    """
-    Turn raw log data into ML features
-    """
+
     # Group by IP and create behavioral features
     features = df.groupby('ip').agg(
         total_attempts    = ('failed', 'count'),
