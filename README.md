@@ -55,7 +55,7 @@ write, no thresholds to tune.
 | Web Dashboard | Flask + Plotly |
 | File Monitoring | Watchdog |
 | Report Generation | ReportLab |
-| Dataset | CICIDS2017 + SSH Auth Logs |
+| Dataset |SSH Auth Logs |
 
 ---
 
