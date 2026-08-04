@@ -39,10 +39,9 @@ write, no thresholds to tune.
 ![Dashboard](assets/dashboard.png)
 
 ### Anomaly Score Distribution
+![Normal Chart](assets/normal.png)
 ![Anomaly Chart](assets/anomaly_chart.png)
 
-### MITRE ATT&CK Mapping
-![MITRE Mapping](assets/mitre_mapping.png)
 
 ---
 
@@ -56,7 +55,7 @@ write, no thresholds to tune.
 | Web Dashboard | Flask + Plotly |
 | File Monitoring | Watchdog |
 | Report Generation | ReportLab |
-| Dataset | CICIDS2017 + SSH Auth Logs |
+| Dataset |SSH Auth Logs |
 
 ---
 
