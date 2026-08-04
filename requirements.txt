@@ -1,0 +1,9 @@
+scikit-learn 
+pandas 
+numpy 
+flask 
+plotly 
+watchdog 
+python-dotenv
+colorama
+reportlab
