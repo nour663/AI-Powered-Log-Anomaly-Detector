@@ -3,6 +3,12 @@ import json
 import pandas as pd
 import plotly.express as px
 import plotly.utils
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
+
 
 from flask import (
     Flask,
@@ -11,7 +17,8 @@ from flask import (
     jsonify,
     redirect,
     url_for,
-    flash
+    flash,
+    send_file
 )
 
 from src.detector import LogDetector
@@ -227,6 +234,85 @@ def health():
     }
 
 
+@app.route("/download-report")
+def generate_report():
+    global last_results
+
+    if last_results.empty:
+        flash("No analysis results available.")
+        return redirect(url_for("index"))
+
+    os.makedirs("reports", exist_ok=True)
+
+    report_path = os.path.abspath(
+        os.path.join("reports", "AI_Log_Report.pdf")
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = styles["Heading1"]
+    title_style.alignment = TA_CENTER
+
+    doc = SimpleDocTemplate(report_path)
+
+    elements = []
+
+    elements.append(
+        Paragraph(
+            "AI-Powered Log Anomaly Detection Report",
+            title_style
+        )
+    )
+
+    elements.append(Paragraph("<br/><br/>", styles["Normal"]))
+
+    total_logs = len(last_results)
+    anomaly_count = int(last_results["is_anomaly"].sum())
+    normal_logs = total_logs - anomaly_count
+
+    elements.append(Paragraph(f"<b>Total Logs:</b> {total_logs}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Normal Logs:</b> {normal_logs}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Anomalies:</b> {anomaly_count}", styles["Normal"]))
+
+    elements.append(Paragraph("<br/><br/>", styles["Normal"]))
+
+    data = [["Timestamp", "IP", "Message", "Score", "Status"]]
+
+    for _, row in last_results.head(100).iterrows():
+
+        data.append([
+            str(row.get("timestamp", "")),
+            str(row.get("ip", "")),
+            str(row.get("message", ""))[:60],
+            f"{row.get('anomaly_score', 0):.4f}",
+            "Anomaly" if row.get("is_anomaly", False) else "Normal"
+        ])
+
+    table = Table(
+        data,
+        colWidths=[1*inch, 1.4*inch, 3.4*inch, 0.8*inch, 0.8*inch]
+    )
+
+    table.setStyle(TableStyle([
+        ("BACKGROUND",(0,0),(-1,0),colors.darkblue),
+        ("TEXTCOLOR",(0,0),(-1,0),colors.white),
+        ("GRID",(0,0),(-1,-1),0.5,colors.black),
+        ("BACKGROUND",(0,1),(-1,-1),colors.beige),
+        ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
+        ("FONTSIZE",(0,0),(-1,-1),8),
+        ("BOTTOMPADDING",(0,0),(-1,0),8),
+    ]))
+
+    elements.append(table)
+
+    doc.build(elements)
+
+    return send_file(
+        report_path,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="AI_Log_Report.pdf"
+    )
 # ----------------------------
 # Run
 # ----------------------------
