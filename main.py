@@ -38,10 +38,14 @@ if args.train:
 
         FEATURE_COLS = [
             "total_requests",
-            "error_requests",
-            "post_requests",
+            "error_count",
+            "post_count",
+            "unique_paths",
+            "avg_size",
+            "status_404",
+            "status_500",
             "error_rate",
-            "post_rate",
+            "path_entropy",
         ]
 
     train_unsupervised(features, FEATURE_COLS)
