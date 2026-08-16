@@ -23,9 +23,7 @@ from flask import (
 
 from src.detector import LogDetector
 
-# ----------------------------
-# Flask Configuration
-# ----------------------------
+
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -41,9 +39,7 @@ detector = LogDetector()
 last_results = pd.DataFrame()
 
 
-# ----------------------------
-# Dashboard
-# ----------------------------
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -110,9 +106,7 @@ def index():
     )
 
 
-# ----------------------------
-# Return alerts
-# ----------------------------
+
 
 @app.route("/api/alerts")
 def alerts():
@@ -120,9 +114,7 @@ def alerts():
     return jsonify(detector.alerts)
 
 
-# ----------------------------
-# Analyze from URL
-# ----------------------------
+
 
 @app.route("/api/analyze/<path:log_path>")
 def analyze(log_path):
@@ -142,9 +134,6 @@ def analyze(log_path):
         }), 500
 
 
-# ----------------------------
-# Plotly Chart
-# ----------------------------
 
 @app.route("/api/chart")
 def chart():
@@ -205,9 +194,7 @@ def chart():
     )
 
 
-# ----------------------------
-# Download results
-# ----------------------------
+
 
 @app.route("/api/results")
 def results():
@@ -222,9 +209,7 @@ def results():
     )
 
 
-# ----------------------------
-# Health check
-# ----------------------------
+
 
 @app.route("/health")
 def health():
@@ -313,9 +298,7 @@ def generate_report():
         as_attachment=True,
         download_name="AI_Log_Report.pdf"
     )
-# ----------------------------
-# Run
-# ----------------------------
+
 
 if __name__ == "__main__":
 
