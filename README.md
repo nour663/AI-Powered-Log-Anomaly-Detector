@@ -7,8 +7,7 @@
 ![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)
 
 A machine learning-powered security tool that analyzes SSH authentication
-logs and web server logs in real time to detect anomalous behavior,
-classify attack types, and map findings to the MITRE ATT&CK framework.
+logs and web server logs in real time to detect anomalous behavior.
 
 ![Dashboard Screenshot](assets/dashboard.png)
 
@@ -21,12 +20,6 @@ This tool takes a different approach: it learns what normal behavior looks
 like, then flags anything that deviates from that baseline. No rules to
 write, no thresholds to tune.
 
-**Detected attack types:**
-- SSH Brute Force (MITRE T1110)
-- Credential Stuffing (MITRE T1110.004)
-- Invalid User Enumeration (MITRE T1078)
-- Web Application Scanning (MITRE T1190)
-- Directory Traversal (MITRE T1083)
 
 ---
 
@@ -155,18 +148,6 @@ log-anomaly-detector/
 └── README.md
 \```
 
----
-
-## 🛡️ MITRE ATT&CK Coverage
-
-| Technique ID | Name | Detection Method |
-|---|---|---|
-| T1110 | Brute Force | High failure rate from single IP |
-| T1110.004 | Credential Stuffing | Many usernames from single IP |
-| T1078 | Valid Accounts | Invalid user enumeration |
-| T1190 | Exploit Public-Facing App | High 4xx error rate |
-| T1046 | Network Service Discovery | Port scan pattern |
-| T1083 | File and Directory Discovery | Path enumeration pattern |
 
 ---
 
@@ -189,11 +170,7 @@ An Isolation Forest model trained on normal traffic scores each
 IP's behavior. IPs with anomaly scores below the threshold are
 flagged as suspicious.
 
-### 4. Classification
-Flagged IPs are classified into attack types based on their
-behavioral profile and mapped to MITRE ATT&CK techniques.
-
-### 5. Alerting
+### 4. Alerting
 Alerts are displayed in real time in the terminal and logged
 to the dashboard for further investigation.
 
